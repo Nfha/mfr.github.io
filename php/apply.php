@@ -1,70 +1,87 @@
 <?php
+if(isset($_POST['submit'])) {
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = $_POST["username"];
-    $subject = $_POST["subject"];
-    $email = $_POST["email"];
-    $body = $_POST["body"];
+    $username = $_POST['username'];
+    $agency = $_POST['subject'];
+    $emailAddress = $_POST['email'];
 
-    $additionalFields = "";
-
-    switch ($subject) {
-        case "Developer":
-            $additionalFields .= "Scripting Language: " . $_POST["dev-scriptsprache"] . "\n";
-            $additionalFields .= "Language for Work: " . $_POST["dev-vorstellung"] . "\n";
-            $additionalFields .= "Years of Development: " . $_POST["dev-since"] . "\n";
-            $additionalFields .= "Networks Visited: " . $_POST["dev-network"] . "\n";
-            $additionalFields .= "Online Time: " . $_POST["dev-time"] . "\n";
+    $message = "
+    Name: " . $_POST['username'] . 
+    "Email : " . $_POST['email'] .
+    "<br><br>Rank : <br>" . $_POST['subject'] .
+    "<br><br>Message : <br>" . $_POST['body'];
+    switch($_POST['subject']){
+        case 'Developer':
+            $message .= "<br><br>Developer : <br>" .
+            "<br><br>Question1 : <br>" . $_POST['dev-scriptsprache'] .
+            "<br><br>Question2 : <br>" . $_POST['dev-vorstellung'] .
+            "<br><br>Question3 : <br>" . $_POST['dev-since'] .
+            "<br><br>Question4 : <br>" . $_POST['dev-network'] .
+            "<br><br>Question5 : <br>" . $_POST['dev-time'];
             break;
-
-        case "Supporter":
-            $additionalFields .= "Tasks of Support: " . $_POST["sup-aufgabe"] . "\n";
-            $additionalFields .= "Support Start/End: " . $_POST["sup-start"] . "\n";
-            $additionalFields .= "Definition of Support: " . $_POST["sup-begriff"] . "\n";
-            $additionalFields .= "Time for Support Activities: " . $_POST["sup-time"] . "\n";
-            $additionalFields .= "Special Rights: " . $_POST["sup-right"] . "\n";
-            $additionalFields .= "Support Online Times: " . $_POST["sup-online"] . "\n";
+        case 'Supporter':
+            $message .= "<br><br>Supporter : <br>" .
+            "<br><br>Question1 : <br>" . $_POST['sup-aufgabe'] .
+            "<br><br>Question2 : <br>" . $_POST['sup-start'] .
+            "<br><br>Question3 : <br>" . $_POST['sup-begriff'] .
+            "<br><br>Question4 (Circa) : <br>" . $_POST['sup-time'] .
+            "<br><br>Question5 : <br>" . $_POST['sup-right'] .
+            "<br><br>Question6 : <br>" . $_POST['sup-online'];
             break;
-
-        case "Concept":
-            $additionalFields .= "Tools for Concepts: " . $_POST["kon-tools"] . "\n";
-            $additionalFields .= "Definition of Finished Concept: " . $_POST["kon-fertig"] . "\n";
-            $additionalFields .= "Criteria for Concepts: " . $_POST["kon-worauf"] . "\n";
-            $additionalFields .= "Time Limit for Concepts: " . $_POST["kon-limit"] . "\n";
-            $additionalFields .= "Attitude to Teamwork: " . $_POST["kon-setting"] . "\n";
-            $additionalFields .= "Concept Online Times: " . $_POST["kon-online"] . "\n";
+        case 'Concept':
+            $message .= "<br><br>Concept : <br>" .
+            "<br><br>Question1 : <br>" . $_POST['kon-tools'] .
+            "<br><br>Question2 : <br>" . $_POST['kon-fertig'] .
+            "<br><br>Question3 : <br>" . $_POST['kon-worauf'] .
+            "<br><br>Question4 : <br>" . $_POST['kon-limit'] .
+            "<br><br>Question5 : <br>" . $_POST['kon-setting'] .
+            "<br><br>Question6 : <br>" . $_POST['kon-online'];
             break;
-
-        case "others":
-            $additionalFields .= "Rank Description: " . $_POST["son-beschreibung"] . "\n";
-            $additionalFields .= "Role of the Rank: " . $_POST["son-aufgaben"] . "\n";
-            $additionalFields .= "Previous Experience: " . $_POST["son-erfahrung"] . "\n";
-            $additionalFields .= "Time for Activities: " . $_POST["son-time"] . "\n";
-            $additionalFields .= "Attitude to Teamwork: " . $_POST["son-setting"] . "\n";
-            $additionalFields .= "Other Online Times: " . $_POST["son-online"] . "\n";
+        case 'others':
+            $message .= "<br><br>Others : <br>" .
+            "<br><br>Question1 : <br>" . $_POST['son-beschreibung'] .
+            "<br><br>Question2 : <br>" . $_POST['son-aufgaben'] .
+            "<br><br>Question3 : <br>" . $_POST['son-erfahrung'] .
+            "<br><br>Question4 : <br>" . $_POST['son-time'] .
+            "<br><br>Question5 : <br>" . $_POST['son-setting'] .
+            "<br><br>Question6 : <br>" . $_POST['son-online'];
             break;
     }
+    
 
-    $message = "Nickname & Discordname: $username\n";
-    $message .= "Rank: $subject\n";
-    $message .= "E-Mail-Adress: $email\n";
-    $message .= "Informations: $body\n\n";
-    $message .= $additionalFields;
+    require '../phpmailer/PHPMailerAutoload.php';
 
-    $headers = "From: $email\r\n";
-    $headers .= "Reply-To: $email\r\n";
-    $headers .= "Content-Type: text/plain;charset=utf-8\r\n";
+    $mail = new PHPMailer();
+    $mail->isSMTP();
 
-    $to = "nfhadoo8@gmail.com"; // Replace with the actual recipient email address
+    // Enter SMTP outbox:
+    $mail->Host = ""; // e.g. smtp.1und1.de
 
-    $subject = "New Application: $username";
+    $mail->IsHTML(true);
+    $mail->SMTPAuth = true;
 
-    if (mail($to, $subject, $message, $headers)) {
-        header("Location: success.php");
-        exit();
-    } else {
-        echo "Error sending email.";
+    // Login and password of the recipient email
+    $mail->Username = ""; // e.g. info@techkings.de
+    $mail->Password = ""; // Password Email / Username
+
+    // Encryption protocol
+    $mail->SMTPSecure = "tls";
+    $mail->Port = 25; // Port for SMTP
+
+    $mail->Subject = "Request via Website";
+    $mail->Body = $message;
+    $mail->setFrom("info@techkings.de", $username); // Deliverer email
+    $mail->addAddress('paillechapeau49@gmail.com'); // email recipient
+
+
+    try{
+        if($mail->send()){
+            header("Location: ../succeed.html");
+            exit();
+        } else {
+            header("Location: ../error.html");
+        }
+    } catch(Exception $e){
+        echo $e->getMessage();
     }
 }
-
-?>
