@@ -59,7 +59,7 @@ function openLink(value) {
         window.location.href = "Rules.html";
     }
     if (value == "whitelist") {
-        alert('Not Implemented yet!')
+        alert('SIR DISCORD')
     }
 }
 
